@@ -1,4 +1,5 @@
 node_modules/
+assets/*.png
 .expo/
 dist/
 npm-debug.*
