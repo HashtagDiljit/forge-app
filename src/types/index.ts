@@ -8,6 +8,8 @@ export interface UserProfile {
   weightKg: number;
   activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
   goals: string[];
+  bio?: string;
+  photoUri?: string;
   createdAt: number;
 }
 
@@ -155,21 +157,17 @@ export interface MoodLog {
 }
 
 // ─── Habits ───────────────────────────────────────────────────────────────────
-export type HabitFrequency = 'daily' | 'specific_days' | 'x_per_week';
-export type HabitCategory = 'health' | 'fitness' | 'mindfulness' | 'learning' | 'productivity';
+export type HabitFrequency = 'daily' | 'weekly';
 
 export interface Habit {
   id: string;
   name: string;
+  description?: string;
   icon: string;
   color: string;
   frequency: HabitFrequency;
-  daysOfWeek?: number[];
-  timesPerWeek?: number;
-  category: HabitCategory;
-  target?: number;
-  targetUnit?: string;
-  stackGroupId?: string;
+  targetCount: number;
+  reminderTime?: string;
   isActive: boolean;
   createdAt: number;
 }
@@ -177,77 +175,63 @@ export interface Habit {
 export interface HabitLog {
   id: string;
   habitId: string;
-  date: string;
-  completed: boolean;
-  skipped: boolean;
-  value?: number;
-  completedAt?: number;
-}
-
-export interface HabitStreak {
-  habitId: string;
-  current: number;
-  longest: number;
-  lastCompletedDate?: string;
+  completedAt: number;
+  count: number;
+  notes?: string;
 }
 
 // ─── Goals ────────────────────────────────────────────────────────────────────
 export type GoalCategory = 'fitness' | 'health' | 'learning' | 'career' | 'finance' | 'personal';
-export type GoalStatus = 'active' | 'completed' | 'archived' | 'paused';
+export type GoalStatus = 'active' | 'completed' | 'paused' | 'cancelled';
 
 export interface Goal {
   id: string;
   title: string;
   description?: string;
   category: GoalCategory;
-  targetValue: number;
-  currentValue: number;
-  unit: string;
-  startDate: string;
-  endDate: string;
+  targetValue?: number;
+  currentValue?: number;
+  unit?: string;
+  targetDate?: number;
   status: GoalStatus;
-  linkedMetricType?: HealthMetricType;
   milestones: GoalMilestone[];
-  reflections: GoalReflection[];
   createdAt: number;
+  completedAt?: number;
 }
 
 export interface GoalMilestone {
   id: string;
-  goalId: string;
   title: string;
-  targetValue: number;
+  targetValue?: number;
   completedAt?: number;
-  order: number;
+  isCompleted: boolean;
 }
 
 export interface GoalReflection {
   id: string;
   goalId: string;
-  question: string;
-  answer: string;
-  weekNumber: number;
+  content: string;
   createdAt: number;
 }
 
 // ─── Tasks ────────────────────────────────────────────────────────────────────
 export type TaskPriority = 'low' | 'medium' | 'high';
-export type TaskView = 'today' | 'upcoming' | 'all';
+export type TaskStatus = 'todo' | 'in_progress' | 'done';
 
 export interface Task {
   id: string;
   title: string;
-  dueDate?: string;
+  description?: string;
   priority: TaskPriority;
-  category?: string;
+  status: TaskStatus;
+  dueDate?: number;
   goalId?: string;
-  isRecurring: boolean;
-  recurringDays?: number[];
+  habitId?: string;
   completedAt?: number;
   createdAt: number;
 }
 
-// ─── Nutrition ────────────────────────────────────────────────────────────────
+// ─── Settings ─────────────────────────────────────────────────────────────────
 export interface NutritionTargets {
   calorieTarget: number;
   proteinG: number;
