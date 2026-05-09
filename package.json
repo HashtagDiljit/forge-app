@@ -48,7 +48,8 @@
     "@types/react": "~19.1.0",
     "typescript": "~5.9.2",
     "drizzle-kit": "^0.30.6",
-    "babel-plugin-module-resolver": "^5.0.2"
+    "babel-plugin-module-resolver": "^5.0.2",
+    "babel-preset-expo": "~12.0.0"
   },
   "private": true
 }
