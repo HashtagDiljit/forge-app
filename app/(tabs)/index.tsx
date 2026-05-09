@@ -27,16 +27,27 @@ import { formatDurationMinutes, formatNumber } from '../../src/lib/utils';
 const STEP_GOAL = 10000;
 const WATER_GOAL_ML = 2500;
 
+function shouldShowToday(habit: any): boolean {
+  if (!habit.isActive) return false;
+  if (habit.frequency === 'daily') return true;
+  if (habit.frequency === 'specific_days') return (habit.daysOfWeek ?? []).includes(new Date().getDay());
+  return true;
+}
+
 function DashboardHeader() {
   const user = useSettingsStore((s) => s.user);
-  const todayHabits = useHabitsStore((s) => s.getTodayHabits());
-  const todayLogs = useHabitsStore((s) => s.getTodayLogs());
+  const habits = useHabitsStore((s) => s.habits);
+  const logs = useHabitsStore((s) => s.logs);
   const recentWorkouts = useWorkoutStore((s) => s.recentWorkouts);
-  const getLastNightSleep = useHealthStore((s) => s.getLastNightSleep);
-  const sleep = getLastNightSleep();
+  const sleepLogs = useHealthStore((s) => s.sleepLogs);
 
-  const completedHabits = todayLogs.filter((l) => l.completed).length;
   const today = format(new Date(), 'yyyy-MM-dd');
+  const todayHabits = habits.filter(shouldShowToday);
+  const todayLogs = logs.filter((l) => l.date === today);
+  const sleep = sleepLogs.length > 0
+    ? [...sleepLogs].sort((a, b) => b.recordedAt - a.recordedAt)[0]
+    : undefined;
+  const completedHabits = todayLogs.filter((l) => l.completed).length;
   const hasWorkout = recentWorkouts.some((w) => {
     if (!w.completedAt) return false;
     return format(new Date(w.completedAt), 'yyyy-MM-dd') === today;
@@ -77,8 +88,10 @@ function DashboardHeader() {
 }
 
 function StepsCard() {
-  const getLatestMetric = useHealthStore((s) => s.getLatestMetric);
-  const steps = getLatestMetric('steps');
+  const metrics = useHealthStore((s) => s.metrics);
+  const steps = metrics
+    .filter((m) => m.type === 'steps')
+    .sort((a, b) => b.recordedAt - a.recordedAt)[0];
   const count = steps?.value ?? 0;
   const pct = Math.round((count / STEP_GOAL) * 100);
 
@@ -108,7 +121,10 @@ function StepsCard() {
 }
 
 function SleepCard() {
-  const sleep = useHealthStore((s) => s.getLastNightSleep());
+  const sleepLogs = useHealthStore((s) => s.sleepLogs);
+  const sleep = sleepLogs.length > 0
+    ? [...sleepLogs].sort((a, b) => b.recordedAt - a.recordedAt)[0]
+    : undefined;
   const hours = sleep ? (sleep.totalMinutes / 60).toFixed(1) : '--';
   const efficiency = sleep?.efficiency ? Math.round(sleep.efficiency * 100) : null;
 
@@ -123,10 +139,11 @@ function SleepCard() {
 }
 
 function HydrationCard() {
-  const getMetricHistory = useHealthStore((s) => s.getMetricHistory);
-  const today = format(new Date(), 'yyyy-MM-dd');
-  const logs = getMetricHistory('hydration', 1);
-  const todayMl = logs.reduce((sum, m) => sum + m.value, 0);
+  const metrics = useHealthStore((s) => s.metrics);
+  const cutoff = Date.now() - 86400000;
+  const todayMl = metrics
+    .filter((m) => m.type === 'hydration' && m.recordedAt >= cutoff)
+    .reduce((sum, m) => sum + m.value, 0);
   const pct = Math.min(todayMl / WATER_GOAL_ML, 1);
 
   return (
@@ -175,8 +192,10 @@ function WorkoutVolumeCard() {
 }
 
 function HeartRateCard() {
-  const getLatestMetric = useHealthStore((s) => s.getLatestMetric);
-  const hr = getLatestMetric('heart_rate_resting');
+  const metrics = useHealthStore((s) => s.metrics);
+  const hr = metrics
+    .filter((m) => m.type === 'heart_rate_resting')
+    .sort((a, b) => b.recordedAt - a.recordedAt)[0];
 
   return (
     <Card onPress={() => router.push('/(tabs)/health')} style={styles.halfCard}>
@@ -196,8 +215,10 @@ function HeartRateCard() {
 }
 
 function CaloriesCard() {
-  const getLatestMetric = useHealthStore((s) => s.getLatestMetric);
-  const calories = getLatestMetric('calories_active');
+  const metrics = useHealthStore((s) => s.metrics);
+  const calories = metrics
+    .filter((m) => m.type === 'calories_active')
+    .sort((a, b) => b.recordedAt - a.recordedAt)[0];
   const targets = useSettingsStore((s) => s.nutritionTargets);
 
   return (
@@ -212,10 +233,13 @@ function CaloriesCard() {
 }
 
 function WeightCard() {
-  const getMetricHistory = useHealthStore((s) => s.getMetricHistory);
-  const history = getMetricHistory('weight', 7);
-  const latest = history[history.length - 1];
+  const metrics = useHealthStore((s) => s.metrics);
   const unitSystem = useSettingsStore((s) => s.unitSystem);
+  const cutoff = Date.now() - 7 * 86400000;
+  const history = metrics
+    .filter((m) => m.type === 'weight' && m.recordedAt >= cutoff)
+    .sort((a, b) => a.recordedAt - b.recordedAt);
+  const latest = history[history.length - 1];
 
   const trend = history.length >= 2
     ? (history[history.length - 1].value - history[0].value)
@@ -245,10 +269,14 @@ function WeightCard() {
 
 function HabitsStreakCard() {
   const habits = useHabitsStore((s) => s.habits);
+  const logs = useHabitsStore((s) => s.logs);
   const streaks = useHabitsStore((s) => s.streaks);
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const todayLogs = logs.filter((l) => l.date === today);
+  const todayHabits = habits.filter(shouldShowToday);
   const longestStreak = habits.reduce((max, h) => Math.max(max, streaks[h.id]?.current ?? 0), 0);
-  const completedToday = useHabitsStore((s) => s.getTodayLogs)().filter((l) => l.completed).length;
-  const totalToday = useHabitsStore((s) => s.getTodayHabits)().length;
+  const completedToday = todayLogs.filter((l) => l.completed).length;
+  const totalToday = todayHabits.length;
 
   return (
     <Card onPress={() => router.push('/(tabs)/habits')} style={styles.halfCard}>
@@ -267,16 +295,20 @@ function HabitsStreakCard() {
 }
 
 function TodaysPlan() {
-  const todayHabits = useHabitsStore((s) => s.getTodayHabits());
-  const todayLogs = useHabitsStore((s) => s.getTodayLogs());
-  const todayTasks = useTasksStore((s) => s.getTodayTasks());
-  const recentWorkouts = useWorkoutStore((s) => s.recentWorkouts);
-  const templates = useWorkoutStore((s) => s.templates);
+  const habits = useHabitsStore((s) => s.habits);
+  const logs = useHabitsStore((s) => s.logs);
+  const tasks = useTasksStore((s) => s.tasks);
 
   const today = format(new Date(), 'yyyy-MM-dd');
+  const todayHabits = habits.filter(shouldShowToday);
+  const todayLogs = logs.filter((l) => l.date === today);
+  const todayTasks = tasks
+    .filter((t) => !t.completedAt && (t.dueDate === today || (!t.dueDate && format(new Date(t.createdAt), 'yyyy-MM-dd') === today)))
+    .slice(0, 3);
+
   const completedHabitIds = new Set(todayLogs.filter((l) => l.completed).map((l) => l.habitId));
   const pendingHabits = todayHabits.filter((h) => !completedHabitIds.has(h.id)).slice(0, 3);
-  const topTasks = todayTasks.slice(0, 3);
+  const topTasks = todayTasks;
 
   return (
     <View style={styles.planSection}>

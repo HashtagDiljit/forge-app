@@ -66,13 +66,22 @@ export default function HabitsTab() {
   );
 }
 
+function shouldShowTodayHabit(habit: Habit): boolean {
+  if (!habit.isActive) return false;
+  if (habit.frequency === 'daily') return true;
+  if (habit.frequency === 'specific_days') return (habit.daysOfWeek ?? []).includes(new Date().getDay());
+  return true;
+}
+
 // ─── Today View ────────────────────────────────────────────────────────────────
 function TodayView({ onAddHabit }: { onAddHabit: () => void }) {
-  const todayHabits = useHabitsStore((s) => s.getTodayHabits());
+  const habits = useHabitsStore((s) => s.habits);
+  const allLogs = useHabitsStore((s) => s.logs);
   const logHabit = useHabitsStore((s) => s.logHabit);
   const streaks = useHabitsStore((s) => s.streaks);
   const today = format(new Date(), 'yyyy-MM-dd');
-  const logs = useHabitsStore((s) => s.getTodayLogs());
+  const todayHabits = habits.filter(shouldShowTodayHabit);
+  const logs = allLogs.filter((l) => l.date === today);
   const completedIds = new Set(logs.filter((l) => l.completed).map((l) => l.habitId));
   const completedCount = completedIds.size;
 
@@ -280,6 +289,7 @@ function CreateHabitModal({ visible, onClose }: { visible: boolean; onClose: () 
       frequency,
       daysOfWeek: [],
       category,
+      target: 1,
       isActive: true,
       createdAt: Date.now(),
     });

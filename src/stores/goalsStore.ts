@@ -80,7 +80,7 @@ export const useGoalsStore = create<GoalsState>()(
       addReflection: (goalId, reflection) =>
         set((s) => ({
           goals: s.goals.map((g) =>
-            g.id === goalId ? { ...g, reflections: [...g.reflections, reflection] } : g
+            g.id === goalId ? { ...g, reflections: [...(g.reflections ?? []), reflection] } : g
           ),
         })),
 

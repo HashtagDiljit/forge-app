@@ -111,7 +111,9 @@ export default function Onboarding() {
           {/* Step 0: Welcome */}
           <View style={styles.page}>
             <View style={styles.logoContainer}>
-              <Text style={styles.logo}>⚡</Text>
+              <View style={styles.logoMark}>
+                <Text style={styles.logoMarkLetter}>F</Text>
+              </View>
               <Text variant="hero" style={{ textAlign: 'center' }}>FORGE</Text>
               <Text variant="body" color="secondary" style={{ textAlign: 'center', marginTop: 8 }}>
                 Build the version that wins.
@@ -272,7 +274,22 @@ const styles = StyleSheet.create({
   dotActive: { width: 20, backgroundColor: Colors.accent.primary },
   page: { width: SCREEN_W, padding: Spacing.lg, flex: 1, justifyContent: 'center' },
   logoContainer: { alignItems: 'center', marginBottom: Spacing.xl },
-  logo: { fontSize: 48, marginBottom: Spacing.md },
+  logoMark: {
+    width: 80,
+    height: 80,
+    borderRadius: 20,
+    backgroundColor: `${Colors.accent.primary}15`,
+    borderWidth: 2,
+    borderColor: Colors.accent.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.md,
+  },
+  logoMarkLetter: {
+    fontFamily: FontFamily.display,
+    fontSize: 44,
+    color: Colors.accent.primary,
+  },
   welcomeText: { textAlign: 'center', lineHeight: 24, marginBottom: Spacing.xl },
   stepTitle: { marginBottom: Spacing.xs },
   stepDesc: { marginBottom: Spacing.lg },

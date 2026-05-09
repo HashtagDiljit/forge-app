@@ -163,10 +163,10 @@ export interface Habit {
   name: string;
   icon: string;
   color: string;
+  category: HabitCategory;
   frequency: HabitFrequency;
   daysOfWeek?: number[];
   timesPerWeek?: number;
-  category: HabitCategory;
   target?: number;
   targetUnit?: string;
   stackGroupId?: string;
@@ -182,6 +182,7 @@ export interface HabitLog {
   skipped: boolean;
   value?: number;
   completedAt?: number;
+  notes?: string;
 }
 
 export interface HabitStreak {
@@ -193,7 +194,7 @@ export interface HabitStreak {
 
 // ─── Goals ────────────────────────────────────────────────────────────────────
 export type GoalCategory = 'fitness' | 'health' | 'learning' | 'career' | 'finance' | 'personal';
-export type GoalStatus = 'active' | 'completed' | 'archived' | 'paused';
+export type GoalStatus = 'active' | 'completed' | 'archived' | 'paused' | 'cancelled';
 
 export interface Goal {
   id: string;
