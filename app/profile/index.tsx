@@ -73,7 +73,8 @@ export default function ProfileSettings() {
 
   const recentWorkouts = useWorkoutStore((s) => s.recentWorkouts);
   const habits = useHabitsStore((s) => s.habits);
-  const goals = useGoalsStore((s) => s.getActiveGoals());
+  const allGoals = useGoalsStore((s) => s.goals);
+  const goals = allGoals.filter((g) => g.status === 'active');
 
   const tdee = user ? calculateTDEE(user) : 0;
   const bmi = user ? calculateBMI(user.weightKg, user.heightCm) : 0;

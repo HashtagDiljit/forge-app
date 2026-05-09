@@ -43,8 +43,9 @@ const CATEGORY_ICONS: Record<GoalCategory, string> = {
 export default function GoalsTab() {
   const [showCreate, setShowCreate] = useState(false);
   const [showCompleted, setShowCompleted] = useState(false);
-  const activeGoals = useGoalsStore((s) => s.getActiveGoals());
-  const completedGoals = useGoalsStore((s) => s.getCompletedGoals());
+  const goals = useGoalsStore((s) => s.goals);
+  const activeGoals = goals.filter((g) => g.status === 'active');
+  const completedGoals = goals.filter((g) => g.status === 'completed');
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
