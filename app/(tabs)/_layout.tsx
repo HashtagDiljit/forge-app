@@ -2,19 +2,21 @@ import { Tabs } from 'expo-router';
 import { View, StyleSheet, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Colors, FontFamily, FontSize, Spacing } from '../../src/constants/theme';
+import { Colors, FontFamily, Spacing, Radius } from '../../src/constants/theme';
 import { Text } from '../../src/components/ui/Text';
 
 type TabIconProps = {
   name: string;
   focused: boolean;
   color: string;
+  activeColor?: string;
 };
 
-function TabIcon({ name, focused, color }: TabIconProps) {
+function TabIcon({ name, focused, color, activeColor }: TabIconProps) {
+  const iconColor = focused && activeColor ? activeColor : color;
   return (
-    <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
-      <MaterialCommunityIcons name={name as any} size={22} color={color} />
+    <View style={[styles.iconContainer, focused && styles.iconContainerActive, focused && activeColor ? { backgroundColor: `${activeColor}18` } : null]}>
+      <MaterialCommunityIcons name={name as any} size={22} color={iconColor} />
     </View>
   );
 }
@@ -47,8 +49,9 @@ export default function TabLayout() {
         name="train/index"
         options={{
           title: 'Train',
+          tabBarActiveTintColor: Colors.accent.primary,
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon name="dumbbell" focused={focused} color={color} />
+            <TabIcon name="dumbbell" focused={focused} color={color} activeColor={Colors.accent.primary} />
           ),
         }}
       />
@@ -56,8 +59,9 @@ export default function TabLayout() {
         name="health/index"
         options={{
           title: 'Health',
+          tabBarActiveTintColor: Colors.accent.secondary,
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon name="heart-pulse" focused={focused} color={color} />
+            <TabIcon name="heart-pulse" focused={focused} color={focused ? Colors.accent.secondary : color} activeColor={Colors.accent.secondary} />
           ),
         }}
       />
@@ -76,6 +80,15 @@ export default function TabLayout() {
           title: 'Goals',
           tabBarIcon: ({ focused, color }) => (
             <TabIcon name="flag-outline" focused={focused} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile/index"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon name="account-circle-outline" focused={focused} color={color} />
           ),
         }}
       />
