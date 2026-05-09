@@ -12,12 +12,17 @@ interface SettingsState {
   habitRemindersEnabled: boolean;
   workoutRemindersEnabled: boolean;
   waterRemindersEnabled: boolean;
+  theme: 'dark' | 'light';
   setHasOnboarded: (v: boolean) => void;
   setUser: (user: UserProfile) => void;
   updateUser: (partial: Partial<UserProfile>) => void;
   setUnitSystem: (system: UnitSystem) => void;
   setNutritionTargets: (targets: Partial<NutritionTargets>) => void;
   setNotificationsEnabled: (v: boolean) => void;
+  setTheme: (theme: 'dark' | 'light') => void;
+  setHabitRemindersEnabled: (v: boolean) => void;
+  setWorkoutRemindersEnabled: (v: boolean) => void;
+  setWaterRemindersEnabled: (v: boolean) => void;
   clearAll: () => void;
 }
 
@@ -40,6 +45,7 @@ export const useSettingsStore = create<SettingsState>()(
       habitRemindersEnabled: true,
       workoutRemindersEnabled: false,
       waterRemindersEnabled: false,
+      theme: 'dark',
 
       setHasOnboarded: (v) => set({ hasOnboarded: v }),
       setUser: (user) => set({ user }),
@@ -51,6 +57,10 @@ export const useSettingsStore = create<SettingsState>()(
       setNutritionTargets: (targets) =>
         set((s) => ({ nutritionTargets: { ...s.nutritionTargets, ...targets } })),
       setNotificationsEnabled: (v) => set({ notificationsEnabled: v }),
+      setTheme: (theme) => set({ theme }),
+      setHabitRemindersEnabled: (v) => set({ habitRemindersEnabled: v }),
+      setWorkoutRemindersEnabled: (v) => set({ workoutRemindersEnabled: v }),
+      setWaterRemindersEnabled: (v) => set({ waterRemindersEnabled: v }),
       clearAll: () =>
         set({
           hasOnboarded: false,
@@ -61,6 +71,7 @@ export const useSettingsStore = create<SettingsState>()(
           habitRemindersEnabled: true,
           workoutRemindersEnabled: false,
           waterRemindersEnabled: false,
+          theme: 'dark',
         }),
     }),
     {

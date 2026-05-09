@@ -8,6 +8,8 @@ export interface UserProfile {
   weightKg: number;
   activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
   goals: string[];
+  bio?: string;
+  photoUri?: string;
   createdAt: number;
 }
 
