@@ -52,8 +52,9 @@ export default function RootLayout() {
       <StatusBar style="light" backgroundColor={Colors.background.primary} />
       <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="onboarding" options={{ headerShown: false, animation: 'slide_from_right' }} />
+        <Stack.Screen name="onboarding/index" options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="workout/[id]" options={{ presentation: 'modal', headerShown: false }} />
+        <Stack.Screen name="workout/active" options={{ presentation: 'modal', headerShown: false }} />
         <Stack.Screen name="exercise/[id]" options={{ presentation: 'card', headerShown: false }} />
         <Stack.Screen name="profile/index" options={{ presentation: 'card', headerShown: false }} />
       </Stack>
